@@ -267,6 +267,15 @@ class BrokerGateway:
             results.append(quote)
         return results
 
+    def fetch_ohlcv(self, code: str, ktype, limit: int = 200) -> pd.DataFrame:
+        """Fetch OHLCV candle history. ktype = moomoo KLType constant."""
+        import pandas as pd
+        ctx = self._require_quote_ctx()
+        ret, df, _ = ctx.request_history_kline(code=code, ktype=ktype, max_count=limit)
+        if ret != RET_OK:
+            raise BrokerGatewayError(f"request_history_kline({code}) failed: {df}")
+        return df
+
     def fetch_spy_quotes(self, options_contract: str) -> tuple[QuoteData, QuoteData]:
         """
         Convenience method: fetch SPY ETF and one SPY options contract.
